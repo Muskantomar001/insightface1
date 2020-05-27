@@ -16,8 +16,7 @@ import torch
 from PIL import Image
 from torch.autograd import Variable
 
-from box_utils import nms
-
+from box_utils import nms, _preprocess
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -44,7 +43,7 @@ def run_first_stage(image, net, scale, threshold):
         img = image.resize((sw, sh), Image.BILINEAR)
         img = np.asarray(img, 'float32')
 
-        img = Variable(torch.FloatTensor(box_utils._preprocess(img)).to(device))
+        img = Variable(torch.FloatTensor(_preprocess(img)).to(device))
         output = net(img)
         probs = output[1].data.cpu().numpy()[0, 1, :, :]
         offsets = output[0].data.cpu().numpy()
@@ -109,10 +108,6 @@ def _generate_bboxes(probs, offsets, scale, threshold):
 
     return bounding_boxes.T
 
-!cp "/content/box_utils.py" .
-
-from mtcnn.mtcnn import MTCNN
-
-box_utils=MTCNN()
-
-!pip install mtcnn
+import os
+os.chdir("/content/drive/My Drive/DLDatasets")
+!ls
